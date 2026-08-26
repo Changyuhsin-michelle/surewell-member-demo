@@ -1,18 +1,47 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Barcode, BrandLogo, Button, Card, Modal, PageHeader, QRBox, SecondaryButton } from '../components/UI';
 import { useDemo } from '../store/DemoContext';
 
 export default function MemberCardPage() {
-  const { state, payWithWallet } = useDemo();
+  const { state, checkoutPurchase } = useDemo();
+  const [searchParams] = useSearchParams();
   const [mode, setMode] = useState<'member' | 'payment'>('member');
   const [bright, setBright] = useState(false);
   const [payOpen, setPayOpen] = useState(false);
   const [amount, setAmount] = useState('200');
+  const [useShoppingCredit, setUseShoppingCredit] = useState(true);
+  const [creditAmount, setCreditAmount] = useState('');
+  const [secondsLeft, setSecondsLeft] = useState(180);
+  const [barcodeToken, setBarcodeToken] = useState(() => Math.random().toString(36).slice(2, 10).toUpperCase());
   const payableAmount = Number(amount);
-  const totalPayable = state.wallet.storedValue + state.wallet.shoppingCredit;
-  const creditPreview = Math.min(state.wallet.shoppingCredit, Math.max(0, payableAmount));
-  const storedPreview = Math.max(0, payableAmount - creditPreview);
+  const requestedCredit = creditAmount ? Number(creditAmount) : payableAmount;
+  const creditPreview = useShoppingCredit ? Math.min(state.wallet.shoppingCredit, requestedCredit, Math.max(0, payableAmount)) : 0;
+  const storedPreview = Math.min(state.wallet.storedValue, Math.max(0, payableAmount - creditPreview));
+  const otherPreview = Math.max(0, payableAmount - creditPreview - storedPreview);
   const progress = Math.min(100, Math.round((state.member.yearlySpend / state.member.nextLevelTarget) * 100));
+  const countdown = useMemo(() => {
+    const minutes = Math.floor(secondsLeft / 60).toString().padStart(2, '0');
+    const seconds = (secondsLeft % 60).toString().padStart(2, '0');
+    return `${minutes}:${seconds}`;
+  }, [secondsLeft]);
+
+  useEffect(() => {
+    if (searchParams.get('mode') === 'payment') setMode('payment');
+  }, [searchParams]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setSecondsLeft((value) => {
+        if (value <= 1) {
+          setBarcodeToken(Math.random().toString(36).slice(2, 10).toUpperCase());
+          return 180;
+        }
+        return value - 1;
+      });
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   return (
     <div className="space-y-4">
@@ -40,13 +69,13 @@ export default function MemberCardPage() {
         </div>
         <div className={`relative mt-4 rounded-[30px] bg-white p-4 text-slate-900 shadow-xl ${bright ? 'scale-[1.03]' : ''}`}>
           <p className="mb-3 text-center text-sm font-black text-slate-500">{mode === 'member' ? '結帳時請出示會員碼' : '使用會員錢包付款'}</p>
-          <QRBox label={mode === 'member' ? state.member.memberNo : `可用 $${totalPayable.toLocaleString()}`} />
+          <QRBox label={mode === 'member' ? state.member.memberNo : `付款碼 ${barcodeToken}`} />
           <div className="mt-4"><Barcode /></div>
           {mode === 'payment' && <Button onClick={() => setPayOpen(true)} className="mt-4 w-full">使用會員錢包付款</Button>}
         </div>
         <div className="mt-4 grid grid-cols-2 gap-3">
           <SecondaryButton onClick={() => setBright((value) => !value)} className={bright ? 'bg-brand-green text-white ring-brand-green' : 'bg-white/15 text-white ring-white/20'}>提升亮度</SecondaryButton>
-          <SecondaryButton className={bright ? 'bg-slate-50' : 'bg-white/15 text-white ring-white/20'}>條碼 02:59</SecondaryButton>
+          <SecondaryButton className={bright ? 'bg-slate-50' : 'bg-white/15 text-white ring-white/20'}>條碼 {countdown}</SecondaryButton>
         </div>
       </section>
       <Card className="bg-gradient-to-br from-white to-brand-mint">
@@ -91,14 +120,40 @@ export default function MemberCardPage() {
               </Card>
             </div>
             <input value={amount} onChange={(event) => setAmount(event.target.value.replace(/\D/g, ''))} className="w-full rounded-2xl bg-slate-50 px-4 py-3 outline-none ring-1 ring-slate-200 focus:ring-brand-green" placeholder="輸入付款金額" />
+            <div className="rounded-3xl bg-slate-50 p-4">
+              <label className="flex items-center justify-between gap-3 font-black">
+                <span>使用購物金</span>
+                <input type="checkbox" checked={useShoppingCredit} onChange={(event) => setUseShoppingCredit(event.target.checked)} className="h-5 w-5 accent-brand-green" />
+              </label>
+              {useShoppingCredit && (
+                <div className="mt-3 grid grid-cols-[1fr_auto] gap-2">
+                  <input
+                    value={creditAmount}
+                    onChange={(event) => setCreditAmount(event.target.value.replace(/\D/g, ''))}
+                    className="min-w-0 rounded-2xl bg-white px-4 py-3 outline-none ring-1 ring-slate-200 focus:ring-brand-green"
+                    placeholder="自訂購物金金額"
+                  />
+                  <SecondaryButton onClick={() => setCreditAmount(String(Math.min(state.wallet.shoppingCredit, payableAmount)))}>全部使用</SecondaryButton>
+                </div>
+              )}
+            </div>
             <div className="rounded-3xl bg-brand-light p-4 text-sm leading-7 text-brand-deep">
-              <p className="font-black">付款順序：優先使用購物金，不足再扣儲值金</p>
+              <p className="font-black">付款順序：商品金額 → 購物金 → 儲值金 → 其他支付</p>
               <p>本次預估折抵購物金 ${creditPreview.toLocaleString()}</p>
               <p>本次預估扣儲值金 ${storedPreview.toLocaleString()}</p>
+              <p>其他支付補足 ${otherPreview.toLocaleString()}</p>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <SecondaryButton onClick={() => setPayOpen(false)}>取消</SecondaryButton>
-              <Button disabled={payableAmount <= 0 || payableAmount > totalPayable} onClick={() => { payWithWallet(payableAmount); setPayOpen(false); }}>確認付款</Button>
+              <Button disabled={payableAmount <= 0} onClick={() => {
+                checkoutPurchase({
+                  originalAmount: payableAmount,
+                  useShoppingCredit,
+                  shoppingCreditAmount: creditPreview,
+                  store: '喜互惠 Demo 店'
+                });
+                setPayOpen(false);
+              }}>確認付款</Button>
             </div>
           </div>
         </Modal>

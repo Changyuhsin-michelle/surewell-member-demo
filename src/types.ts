@@ -56,6 +56,16 @@ export interface Transaction {
   status?: string;
 }
 
+export interface ShoppingCreditRecord {
+  id: string;
+  date: string;
+  time?: string;
+  title: string;
+  amount: number;
+  detail: string;
+  source: 'points' | 'topup' | 'payment' | 'promo';
+}
+
 export interface StoredProduct {
   id: string;
   name: string;
@@ -87,6 +97,7 @@ export interface PointReward {
   pointsCost: number;
   valueLabel: string;
   claimed: boolean;
+  oneTime?: boolean;
 }
 
 export interface Insight {
@@ -114,5 +125,6 @@ export interface DemoState {
   notifications: NotificationItem[];
   missions: Mission[];
   pointRewards: PointReward[];
+  shoppingCreditRecords: ShoppingCreditRecord[];
   insight: Insight;
 }

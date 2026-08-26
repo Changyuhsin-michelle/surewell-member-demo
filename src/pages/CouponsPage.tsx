@@ -12,11 +12,14 @@ const tabs: { key: CouponStatus; label: string }[] = [
 ];
 
 export default function CouponsPage() {
-  const { state, useCoupon } = useDemo();
+  const { state, checkoutPurchase } = useDemo();
   const navigate = useNavigate();
   const [tab, setTab] = useState<CouponStatus>('available');
   const [selected, setSelected] = useState<Coupon | null>(null);
   const [loading, setLoading] = useState(false);
+  const [checkoutAmount, setCheckoutAmount] = useState('500');
+  const [useShoppingCredit, setUseShoppingCredit] = useState(true);
+  const [creditAmount, setCreditAmount] = useState('');
   const coupons = useMemo(() => state.coupons.filter((coupon) => coupon.status === tab), [state.coupons, tab]);
   const activeCount = state.coupons.filter((coupon) => coupon.status !== 'used').length;
 
@@ -36,13 +39,30 @@ export default function CouponsPage() {
 
   const handleUse = () => {
     if (!selected) return;
+    const amount = Number(checkoutAmount);
+    if (amount <= 0) return;
     setLoading(true);
     window.setTimeout(() => {
-      useCoupon(selected.id);
+      const requestedCredit = creditAmount ? Number(creditAmount) : amount;
+      checkoutPurchase({
+        originalAmount: amount,
+        couponId: selected.id,
+        useShoppingCredit,
+        shoppingCreditAmount: requestedCredit,
+        store: '喜互惠羅東店'
+      });
       setLoading(false);
       setSelected(null);
     }, 700);
   };
+
+  const selectedMinimum = selected?.threshold.includes('滿') ? Number(selected.threshold.match(/\d+/)?.[0] ?? 0) : 0;
+  const selectedAmount = Number(checkoutAmount);
+  const minimumPassed = selected ? selectedAmount >= selectedMinimum : true;
+  const selectedDiscount = selected ? (selected.title.includes('95') ? Math.round(selectedAmount * 0.05) : Number(selected.title.replace(/^滿\s?\d+\s?元?/, '').match(/\d+/)?.[0] ?? (selected.title.includes('第二件') ? 50 : 0))) : 0;
+  const creditPreview = useShoppingCredit ? Math.min(state.wallet.shoppingCredit, creditAmount ? Number(creditAmount) : selectedAmount, Math.max(0, selectedAmount - selectedDiscount)) : 0;
+  const storedPreview = Math.min(state.wallet.storedValue, Math.max(0, selectedAmount - selectedDiscount - creditPreview));
+  const otherPreview = Math.max(0, selectedAmount - selectedDiscount - creditPreview - storedPreview);
 
   return (
     <div className="space-y-4">
@@ -115,17 +135,39 @@ export default function CouponsPage() {
               <h3 className="text-xl font-black">{selected.title}</h3>
               <p className="mt-1 text-sm text-slate-500">{selected.description}</p>
             </div>
-            <QRBox label="優惠券核銷碼" />
+            <QRBox label="優惠券結帳碼" />
             <div className="rounded-3xl bg-slate-50 p-4 text-sm leading-7">
               <p>使用期限：{selected.expireDate}</p>
               <p>使用門檻：{selected.threshold}</p>
               <p>適用商品：{selected.product}</p>
               <p>適用門市：喜互惠各門市</p>
-              <p>注意事項：不可與部分活動併用，依門市結帳結果為準。</p>
+              <p>注意事項：優惠券會在付款成功後才核銷，取消付款不會影響券狀態。</p>
+            </div>
+            <div className="space-y-3 rounded-3xl bg-white p-4 ring-1 ring-slate-100">
+              <label className="text-sm font-black text-slate-700">模擬本次消費金額</label>
+              <input value={checkoutAmount} onChange={(event) => setCheckoutAmount(event.target.value.replace(/\D/g, ''))} className="w-full rounded-2xl bg-slate-50 px-4 py-3 outline-none ring-1 ring-slate-200 focus:ring-brand-green" />
+              {!minimumPassed && <p className="text-sm font-bold text-red-600">未達最低消費門檻，需滿 ${selectedMinimum.toLocaleString()} 才可使用。</p>}
+              <label className="flex items-center justify-between gap-3 rounded-2xl bg-slate-50 p-3 font-black">
+                <span>使用購物金</span>
+                <input type="checkbox" checked={useShoppingCredit} onChange={(event) => setUseShoppingCredit(event.target.checked)} className="h-5 w-5 accent-brand-green" />
+              </label>
+              {useShoppingCredit && (
+                <div className="grid grid-cols-[1fr_auto] gap-2">
+                  <input value={creditAmount} onChange={(event) => setCreditAmount(event.target.value.replace(/\D/g, ''))} className="min-w-0 rounded-2xl bg-slate-50 px-4 py-3 outline-none ring-1 ring-slate-200 focus:ring-brand-green" placeholder="自訂購物金" />
+                  <SecondaryButton onClick={() => setCreditAmount(String(Math.min(state.wallet.shoppingCredit, Math.max(0, selectedAmount - selectedDiscount))))}>全部使用</SecondaryButton>
+                </div>
+              )}
+              <div className="rounded-2xl bg-brand-light p-3 text-sm leading-7 text-brand-deep">
+                <p>商品金額 ${selectedAmount.toLocaleString()}</p>
+                <p>優惠券折抵 -${minimumPassed ? selectedDiscount.toLocaleString() : '0'}</p>
+                <p>購物金折抵 -${minimumPassed ? creditPreview.toLocaleString() : '0'}</p>
+                <p>儲值金付款 ${minimumPassed ? storedPreview.toLocaleString() : '0'}</p>
+                <p>其他支付 ${minimumPassed ? otherPreview.toLocaleString() : '0'}</p>
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <SecondaryButton onClick={() => setSelected(null)}>取消</SecondaryButton>
-              <Button loading={loading} onClick={handleUse}>出示優惠券</Button>
+              <Button disabled={!minimumPassed || selectedAmount <= 0} loading={loading} onClick={handleUse}>確認付款並核銷</Button>
             </div>
           </div>
         </Modal>

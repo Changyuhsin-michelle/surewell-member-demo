@@ -64,7 +64,7 @@ export function Badge({ children, tone = 'green' }: { children: ReactNode; tone?
 export function Modal({ title, children, onClose }: { title: string; children: ReactNode; onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/45 p-0 backdrop-blur-[2px] md:items-center md:p-4">
-      <div className="safe-bottom w-full max-w-[430px] rounded-t-[30px] bg-white p-5 shadow-2xl md:rounded-[30px]">
+      <div className="safe-bottom max-h-[92vh] w-full max-w-[430px] overflow-y-auto rounded-t-[30px] bg-white p-5 shadow-2xl md:rounded-[30px]">
         <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-200 md:hidden" />
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-black text-slate-900">{title}</h2>

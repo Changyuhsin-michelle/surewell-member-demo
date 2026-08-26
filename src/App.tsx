@@ -16,6 +16,7 @@ import MemberBenefitsPage from './pages/MemberBenefitsPage';
 import SpendingInsightsPage from './pages/SpendingInsightsPage';
 import CouponDetailPage from './pages/CouponDetailPage';
 import TransactionDetailPage from './pages/TransactionDetailPage';
+import ShoppingCreditPage from './pages/ShoppingCreditPage';
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
         <Route path="/member-benefits" element={<MemberBenefitsPage />} />
         <Route path="/wallet" element={<WalletPage />} />
         <Route path="/wallet/topup" element={<TopUpPage />} />
+        <Route path="/wallet/shopping-credit" element={<ShoppingCreditPage />} />
         <Route path="/stored-products" element={<StoredProductsPage />} />
         <Route path="/points" element={<PointsCenterPage />} />
         <Route path="/missions" element={<MissionsPage />} />

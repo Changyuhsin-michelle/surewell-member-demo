@@ -10,7 +10,7 @@ export default function WalletPage() {
 
   const cards = [
     { label: '儲值金', value: `$${state.wallet.storedValue.toLocaleString()}`, icon: WalletCards, to: '/wallet/topup', color: 'text-brand-green bg-brand-light' },
-    { label: '購物金', value: `$${state.wallet.shoppingCredit.toLocaleString()}`, icon: CreditCard, to: '/transactions', color: 'text-orange-600 bg-orange-50' },
+    { label: '購物金', value: `$${state.wallet.shoppingCredit.toLocaleString()}`, icon: CreditCard, to: '/wallet/shopping-credit', color: 'text-orange-600 bg-orange-50' },
     { label: '會員點數', value: state.wallet.points.toLocaleString(), icon: Coins, to: '/points', color: 'text-brand-green bg-brand-light' },
     { label: '優惠券', value: `${activeCoupons} 張`, icon: Ticket, to: '/coupons', color: 'text-red-600 bg-red-50' }
   ];
@@ -25,7 +25,7 @@ export default function WalletPage() {
         <p className="mt-2 text-sm text-white/70">購物金 ${state.wallet.shoppingCredit.toLocaleString()} 可於指定活動折抵</p>
         <div className="mt-5 grid grid-cols-2 gap-3">
           <Button onClick={() => navigate('/wallet/topup')} className="bg-white text-brand-deep shadow-none"><Plus size={18} />儲值</Button>
-          <SecondaryButton onClick={() => navigate('/member-card')} className="bg-white/15 text-white ring-white/20"><ReceiptText size={18} />付款碼</SecondaryButton>
+          <SecondaryButton onClick={() => navigate('/member-card?mode=payment')} className="bg-white/15 text-white ring-white/20"><ReceiptText size={18} />付款碼</SecondaryButton>
         </div>
       </section>
       <div className="grid grid-cols-2 gap-3">

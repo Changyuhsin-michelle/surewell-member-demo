@@ -41,8 +41,8 @@ export default function PointsCenterPage() {
                   <p className="text-sm text-slate-500">需要 {reward.pointsCost.toLocaleString()} 點</p>
                 </div>
               </div>
-              <Button disabled={reward.claimed || state.wallet.points < reward.pointsCost} onClick={() => redeemPointReward(reward.id)} className="shrink-0 px-3 py-2 text-xs">
-                {reward.claimed ? '已兌換' : '兌換'}
+              <Button disabled={(reward.oneTime && reward.claimed) || state.wallet.points < reward.pointsCost} onClick={() => redeemPointReward(reward.id)} className="shrink-0 px-3 py-2 text-xs">
+                {reward.oneTime && reward.claimed ? '已兌換' : '兌換'}
               </Button>
             </Card>
           ))}

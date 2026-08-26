@@ -64,9 +64,14 @@ export const defaultState: DemoState = {
     { id: 'm3', title: '指定分類消費一次', description: '購買水果、飲品或熟食任一分類', current: 1, target: 1, unit: '次', rewardType: 'points', rewardLabel: '20 點', rewardPoints: 20, claimed: false }
   ],
   pointRewards: [
-    { id: 'pr1', title: '100 點換 10 元購物金', pointsCost: 100, valueLabel: '10 元購物金', claimed: false },
-    { id: 'pr2', title: '500 點換 60 元購物金', pointsCost: 500, valueLabel: '60 元購物金', claimed: false },
-    { id: 'pr3', title: '1000 點換 150 元購物金', pointsCost: 1000, valueLabel: '150 元購物金', claimed: false }
+    { id: 'pr1', title: '500 點換 50 元購物金', pointsCost: 500, valueLabel: '50 元購物金', claimed: false },
+    { id: 'pr2', title: '1000 點換 120 元購物金', pointsCost: 1000, valueLabel: '120 元購物金', claimed: false },
+    { id: 'pr3', title: '生日月限定 300 點換 50 元券', pointsCost: 300, valueLabel: '50 元券', claimed: false, oneTime: true }
+  ],
+  shoppingCreditRecords: [
+    { id: 'sc1', date: '2026/08/23', time: '12:10', title: '儲值活動贈送', amount: 120, detail: '儲值 2,000 元加贈購物金。', source: 'topup' },
+    { id: 'sc2', date: '2026/08/17', time: '16:22', title: '點數兌換', amount: 50, detail: '使用 500 點兌換購物金。', source: 'points' },
+    { id: 'sc3', date: '2026/08/15', time: '18:40', title: '門市消費折抵', amount: -50, detail: '羅東店結帳使用購物金折抵。', source: 'payment' }
   ],
   insight: {
     thisMonth: 3680,
