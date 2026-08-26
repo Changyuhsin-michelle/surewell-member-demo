@@ -21,7 +21,7 @@ export default function CouponDetailPage() {
     <div className="space-y-4">
       <PageHeader title="優惠券詳細" subtitle="確認使用條件後，結帳時出示核銷碼。" />
       <section className="rounded-[34px] bg-gradient-to-br from-brand-deep to-brand-green p-5 text-white shadow-retail">
-        <p className="text-sm text-white/70">{coupon.category ?? '會員限定'}</p>
+        <p className="text-sm text-white/70">{coupon.category ?? '會員限定'}｜剩 {coupon.daysLeft ?? '—'} 天到期</p>
         <h1 className="mt-1 text-4xl font-black">{couponHero(coupon.title)}</h1>
         <p className="mt-2 text-lg font-black">{coupon.title}</p>
         <p className="mt-1 text-sm text-white/75">{coupon.description}</p>

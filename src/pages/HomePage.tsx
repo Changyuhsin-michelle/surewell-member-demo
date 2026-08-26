@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Bot, BarChart3, ChevronRight, Coffee, Crown, Gift, History, Milk, Sandwich, Apple, Cookie, Settings, Coins, Trophy } from 'lucide-react';
+import { Bell, Bot, BarChart3, ChevronRight, Coffee, Crown, Gift, History, Milk, Settings, Coins, Trophy } from 'lucide-react';
 import { Badge, BrandLogo, Button, Card } from '../components/UI';
 import { useDemo } from '../store/DemoContext';
 
@@ -15,6 +15,7 @@ export default function HomePage() {
   const { state, unreadCount } = useDemo();
   const navigate = useNavigate();
   const expiringCount = useMemo(() => state.coupons.filter((coupon) => coupon.status === 'expiring').length, [state.coupons]);
+  const expiringCoupons = useMemo(() => state.coupons.filter((coupon) => coupon.status === 'expiring'), [state.coupons]);
   const activeCouponCount = useMemo(() => state.coupons.filter((coupon) => coupon.status !== 'used').length, [state.coupons]);
   const remainingCups = state.storedProducts.reduce((sum, item) => sum + item.total - item.redeemed, 0);
   const progress = Math.min(100, Math.round((state.member.yearlySpend / state.member.nextLevelTarget) * 100));
@@ -87,7 +88,7 @@ export default function HomePage() {
               <span className="text-sm text-slate-400 line-through">$92</span>
               <span className="text-xl font-black text-brand-green">$46</span>
             </div>
-            <Button onClick={() => navigate('/coupons')} className="mt-3 w-full py-2">查看優惠</Button>
+            <Button onClick={() => navigate('/coupons/c2')} className="mt-3 w-full py-2">立即使用</Button>
           </div>
         </div>
       </Card>
@@ -135,19 +136,24 @@ export default function HomePage() {
       </section>
 
       <section>
-        <h2 className="mb-3 text-lg font-black">猜你喜歡</h2>
+        <div className="mb-3 flex items-end justify-between">
+          <h2 className="text-lg font-black">即將到期優惠</h2>
+          <button onClick={() => navigate('/coupons')} className="text-sm font-black text-brand-green">全部優惠</button>
+        </div>
         <div className="flex gap-3 overflow-x-auto pb-1">
-          {[
-            { name: '鮮奶', icon: Milk, tone: 'bg-brand-light text-brand-green' },
-            { name: '穀王吐司', icon: Sandwich, tone: 'bg-orange-50 text-orange-500' },
-            { name: '水果', icon: Apple, tone: 'bg-red-50 text-red-500' },
-            { name: '餅乾', icon: Cookie, tone: 'bg-yellow-50 text-yellow-600' }
-          ].map((product) => (
-            <Card key={product.name} className="min-w-[150px] p-3">
-              <div className={`flex h-24 items-center justify-center rounded-3xl ${product.tone}`}><product.icon size={42} /></div>
-              <p className="mt-2 font-black">{product.name}</p>
-              <p className="text-xs text-slate-500">依最近 30 天購買紀錄推薦</p>
-            </Card>
+          {expiringCoupons.map((coupon) => (
+            <button key={coupon.id} onClick={() => navigate(`/coupons/${coupon.id}`)} className="min-w-[235px] text-left">
+              <Card className="bg-gradient-to-br from-white to-orange-50 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-black text-orange-700">剩 {coupon.daysLeft ?? 3} 天到期</p>
+                    <h3 className="mt-1 text-lg font-black">{coupon.title}</h3>
+                    <p className="mt-1 text-sm text-slate-500">{coupon.threshold}</p>
+                  </div>
+                  <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-black text-orange-700">立即使用</span>
+                </div>
+              </Card>
+            </button>
           ))}
         </div>
       </section>

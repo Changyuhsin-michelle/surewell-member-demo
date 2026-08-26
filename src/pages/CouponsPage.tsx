@@ -27,6 +27,13 @@ export default function CouponsPage() {
     return match ? `$${match[1]} OFF` : '會員優惠';
   };
 
+  const expiryTone = (coupon: Coupon) => {
+    if (coupon.status === 'used') return 'bg-slate-100 text-slate-500';
+    if ((coupon.daysLeft ?? 99) <= 3) return 'bg-red-50 text-red-700';
+    if ((coupon.daysLeft ?? 99) <= 7) return 'bg-orange-50 text-orange-700';
+    return 'bg-brand-light text-brand-deep';
+  };
+
   const handleUse = () => {
     if (!selected) return;
     setLoading(true);
@@ -75,24 +82,27 @@ export default function CouponsPage() {
             </div>
             <div className="relative p-4">
               <div className="absolute -left-3 top-1/2 h-6 w-6 -translate-y-1/2 rounded-full bg-[#f7f7f4]" />
-              <div className="absolute right-5 top-5 h-14 w-14 rounded-full border-2 border-dashed border-emerald-100" />
-          <div className="flex items-start justify-between gap-2">
-            <div>
-              <h2 className="text-lg font-black">{coupon.title}</h2>
-              <p className="mt-1 text-sm text-slate-500">{coupon.description}</p>
-            </div>
-            {coupon.status === 'expiring' && <Badge tone="red">快到期</Badge>}
-            {coupon.status === 'used' && <Badge tone="gray">已使用</Badge>}
-          </div>
-          <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-slate-500">
-            <p>期限：{coupon.expireDate}</p>
-            <p>門檻：{coupon.threshold}</p>
-            <p className="col-span-2">適用商品：{coupon.product}</p>
-          </div>
-          <div className="mt-4 grid grid-cols-2 gap-2">
-            <Button onClick={() => navigate(`/coupons/${coupon.id}`)} className="py-2.5">詳細</Button>
-            <Button onClick={() => setSelected(coupon)} disabled={coupon.status === 'used'} className="py-2.5">{coupon.status === 'used' ? '已使用' : '立即使用'}</Button>
-          </div>
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <h2 className="text-lg font-black">{coupon.title}</h2>
+                  <p className="mt-1 text-sm text-slate-500">{coupon.description}</p>
+                </div>
+                {coupon.status === 'used' && <Badge tone="gray">已使用</Badge>}
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className={`rounded-full px-3 py-1 text-xs font-black ${expiryTone(coupon)}`}>
+                  {coupon.status === 'used' ? '已使用' : `剩 ${coupon.daysLeft ?? '—'} 天`}
+                </span>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">{coupon.category ?? '會員限定'}</span>
+              </div>
+              <div className="mt-3 space-y-1 text-xs text-slate-500">
+                <p>門檻：{coupon.threshold}</p>
+                <p>適用商品：{coupon.product}</p>
+              </div>
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <Button onClick={() => navigate(`/coupons/${coupon.id}`)} className="py-2.5">詳情</Button>
+                <Button onClick={() => setSelected(coupon)} disabled={coupon.status === 'used'} className="py-2.5">{coupon.status === 'used' ? '已使用' : '立即使用'}</Button>
+              </div>
             </div>
           </div>
         </Card>
