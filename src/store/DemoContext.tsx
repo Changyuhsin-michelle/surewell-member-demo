@@ -67,7 +67,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
             date: '2026/08/26',
             title: coupon.title,
             store: '會員券匣',
-            detail: `${coupon.title} 已模擬使用。`
+            detail: `${coupon.title} 已完成核銷。`
           }),
           ...current.transactions
         ]
@@ -135,7 +135,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
   const resetDemo = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY);
     setState(defaultState);
-    setToast('Demo 資料已重置');
+    setToast('展示資料已重置');
     window.setTimeout(() => setToast(null), 2400);
   }, []);
 

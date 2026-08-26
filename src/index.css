@@ -4,7 +4,7 @@
 
 :root {
   color: #1e293b;
-  background: #edf3ef;
+  background: #f3f5f2;
   font-family: "Microsoft JhengHei", "Noto Sans TC", system-ui, sans-serif;
 }
 
@@ -12,6 +12,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background: #f3f5f2;
 }
 
 button, input, select, textarea {
@@ -20,6 +21,10 @@ button, input, select, textarea {
 
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top);
 }
 
 .barcode-line {

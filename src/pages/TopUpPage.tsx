@@ -31,10 +31,15 @@ export default function TopUpPage() {
   return (
     <div className="space-y-4">
       <PageHeader title="儲值" subtitle={`目前儲值金 $${state.wallet.storedValue.toLocaleString()}`} />
+      <section className="rounded-[32px] bg-gradient-to-br from-brand-deep to-brand-green p-5 text-white shadow-retail">
+        <p className="text-sm text-white/65">目前可用儲值金</p>
+        <h1 className="mt-1 text-4xl font-black">${state.wallet.storedValue.toLocaleString()}</h1>
+        <p className="mt-2 text-sm text-white/70">儲值後可於門市結帳使用，活動購物金將自動加入錢包。</p>
+      </section>
       <div className="space-y-3">
         {plans.map((plan) => (
           <button key={plan.amount} onClick={() => setSelected(plan)} className="w-full">
-            <Card className={`flex items-center justify-between text-left transition active:scale-[0.98] ${plan.bonus ? 'border-orange-100 bg-brand-cream' : ''}`}>
+            <Card className={`flex items-center justify-between text-left transition active:scale-[0.98] ${plan.bonus ? 'bg-brand-cream' : ''}`}>
               <div>
                 <p className="text-xl font-black">儲值 {plan.amount.toLocaleString()} 元</p>
                 <p className="text-sm text-slate-500">{plan.bonus ? `加贈 ${plan.bonus} 元購物金` : '一般儲值方案'}</p>

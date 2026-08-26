@@ -39,8 +39,13 @@ export default function AiAssistantPage() {
 
   return (
     <div className="flex min-h-[calc(100vh-120px)] flex-col space-y-4">
-      <PageHeader title="喜互惠 AI 小幫手" subtitle="Demo 版使用規則式 mock AI，會讀取目前會員狀態。" />
-      <Card className="flex-1 space-y-3 border-emerald-50 bg-white/95 shadow-soft">
+      <PageHeader title="喜互惠 AI 助理" subtitle="依你的會員狀態，快速查詢資產、優惠與推薦。" />
+      <div className="grid grid-cols-4 gap-2">
+        {['我的資產', '我的優惠', '我的寄存', '消費分析'].map((item) => (
+          <button key={item} onClick={() => send(item)} className="rounded-[18px] bg-white px-2 py-3 text-xs font-black text-brand-deep shadow-soft active:scale-[0.97]">{item}</button>
+        ))}
+      </div>
+      <Card className="flex-1 space-y-3 bg-white/95 shadow-soft">
         {messages.map((message, index) => (
           <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[82%] rounded-[24px] px-4 py-3 text-sm leading-6 shadow-sm ${message.role === 'user' ? 'bg-brand-green text-white' : 'bg-brand-light text-slate-700'}`}>

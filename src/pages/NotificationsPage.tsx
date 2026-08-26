@@ -20,9 +20,14 @@ export default function NotificationsPage() {
         subtitle={`${unreadCount} 則未讀通知`}
         action={<Button onClick={markAllNotificationsRead} className="px-3 py-2 text-xs">全部已讀</Button>}
       />
+      <div className="flex gap-2 overflow-x-auto pb-1">
+        {['全部', '優惠', '會員', '交易', '系統'].map((item, index) => (
+          <span key={item} className={`shrink-0 rounded-full px-4 py-2 text-sm font-black ${index === 0 ? 'bg-brand-green text-white' : 'bg-white text-slate-500 shadow-soft'}`}>{item}</span>
+        ))}
+      </div>
       {state.notifications.length === 0 ? <EmptyState title="沒有通知" body="有新的會員提醒會顯示在這裡。" /> : state.notifications.map((item) => (
         <button key={item.id} onClick={() => openNotification(item)} className="w-full text-left">
-          <Card className={`transition active:scale-[0.99] ${!item.read ? 'border-brand-green bg-brand-light shadow-retail' : ''}`}>
+          <Card className={`transition active:scale-[0.99] ${!item.read ? 'bg-brand-light shadow-retail ring-1 ring-brand-green/10' : ''}`}>
             <div className="flex gap-3">
               <div className={`rounded-2xl p-3 ${item.read ? 'bg-slate-100 text-slate-500' : 'bg-white text-brand-green shadow-sm'}`}><Bell size={22} /></div>
               <div className="flex-1">

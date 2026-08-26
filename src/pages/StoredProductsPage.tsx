@@ -23,8 +23,13 @@ export default function StoredProductsPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title="寄杯 / 寄商品" subtitle="可分次領取，也可保留未來擴充轉贈。" />
-      <Card className="border-emerald-100 bg-gradient-to-br from-white to-brand-mint">
+      <PageHeader title="我的寄存" subtitle="已購買可分次領取的商品都會集中在這裡。" />
+      <div className="flex gap-2 overflow-x-auto pb-1">
+        {['全部', '飲品', '食品', '其他'].map((item, index) => (
+          <span key={item} className={`shrink-0 rounded-full px-4 py-2 text-sm font-black ${index === 0 ? 'bg-brand-green text-white' : 'bg-white text-slate-500 shadow-soft'}`}>{item}</span>
+        ))}
+      </div>
+      <Card className="bg-gradient-to-br from-white to-brand-mint">
         <div className="flex items-start justify-between">
           <div>
             <h2 className="text-xl font-black">{product.name}</h2>
@@ -60,12 +65,12 @@ export default function StoredProductsPage() {
         </Modal>
       )}
       {giftOpen && (
-        <Modal title="轉贈好友 Demo" onClose={() => setGiftOpen(false)}>
+        <Modal title="轉贈好友" onClose={() => setGiftOpen(false)}>
           <div className="space-y-4">
             {giftDone ? (
               <div className="rounded-3xl bg-brand-light p-4 text-center">
                 <p className="text-lg font-black text-brand-deep">已產生轉贈邀請</p>
-                <p className="mt-2 text-sm text-slate-600">Demo 不會真的傳送簡訊，正式版可串 LINE 或簡訊通知。</p>
+                <p className="mt-2 text-sm text-slate-600">已產生好友領取邀請，可於正式服務串接 LINE 或簡訊通知。</p>
               </div>
             ) : (
               <>
