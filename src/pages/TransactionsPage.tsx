@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Card, EmptyState, PageHeader } from '../components/UI';
 import { useDemo } from '../store/DemoContext';
 import type { TransactionType } from '../types';
@@ -8,13 +9,15 @@ const filters: { label: string; type: TransactionType | 'all' }[] = [
   { label: '全部', type: 'all' },
   { label: '消費', type: 'purchase' },
   { label: '儲值', type: 'topup' },
+  { label: '付款', type: 'payment' },
   { label: '點數', type: 'points' },
   { label: '優惠券', type: 'coupon' },
-  { label: '寄杯', type: 'stored' }
+  { label: '寄存', type: 'stored' }
 ];
 
 export default function TransactionsPage() {
   const { state } = useDemo();
+  const navigate = useNavigate();
   const [filter, setFilter] = useState<TransactionType | 'all'>('all');
   const [expanded, setExpanded] = useState<string | null>(null);
   const txs = state.transactions.filter((tx) => filter === 'all' || tx.type === filter);
@@ -32,12 +35,12 @@ export default function TransactionsPage() {
         ))}
       </div>
       {txs.length === 0 ? <EmptyState title="沒有紀錄" body="目前分類沒有交易。" /> : txs.map((tx) => (
-        <button key={tx.id} onClick={() => setExpanded(expanded === tx.id ? null : tx.id)} className="w-full text-left">
+        <button key={tx.id} onClick={() => setExpanded(expanded === tx.id ? null : tx.id)} onDoubleClick={() => navigate(`/transactions/${tx.id}`)} className="w-full text-left">
           <Card className="transition active:scale-[0.99]">
             <div className="flex items-start justify-between gap-3">
               <div className="flex min-w-0 gap-3">
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-light text-brand-green">
-                  {tx.type === 'purchase' ? '購' : tx.type === 'topup' ? '儲' : tx.type === 'coupon' ? '券' : tx.type === 'stored' ? '寄' : '點'}
+                  {tx.type === 'purchase' ? '購' : tx.type === 'topup' ? '儲' : tx.type === 'payment' ? '付' : tx.type === 'coupon' ? '券' : tx.type === 'stored' ? '寄' : '點'}
                 </div>
                 <div className="min-w-0">
                 <p className="font-black">{tx.title}</p>
@@ -49,7 +52,12 @@ export default function TransactionsPage() {
                 {tx.points !== undefined && <p className="text-sm font-bold text-brand-green">{tx.points > 0 ? '+' : ''}{tx.points} 點</p>}
               </div>
             </div>
-            {expanded === tx.id && <p className="mt-3 rounded-2xl bg-slate-50 p-3 text-sm leading-6 text-slate-600">{tx.detail}</p>}
+            {expanded === tx.id && (
+              <div className="mt-3 rounded-2xl bg-slate-50 p-3 text-sm leading-6 text-slate-600">
+                <p>{tx.detail}</p>
+                <button onClick={(event) => { event.stopPropagation(); navigate(`/transactions/${tx.id}`); }} className="mt-2 font-black text-brand-green">查看詳細</button>
+              </div>
+            )}
           </Card>
         </button>
       ))}

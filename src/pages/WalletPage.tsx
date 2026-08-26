@@ -11,7 +11,7 @@ export default function WalletPage() {
   const cards = [
     { label: '儲值金', value: `$${state.wallet.storedValue.toLocaleString()}`, icon: WalletCards, to: '/wallet/topup', color: 'text-brand-green bg-brand-light' },
     { label: '購物金', value: `$${state.wallet.shoppingCredit.toLocaleString()}`, icon: CreditCard, to: '/transactions', color: 'text-orange-600 bg-orange-50' },
-    { label: '會員點數', value: state.wallet.points.toLocaleString(), icon: Coins, to: '/transactions', color: 'text-brand-green bg-brand-light' },
+    { label: '會員點數', value: state.wallet.points.toLocaleString(), icon: Coins, to: '/points', color: 'text-brand-green bg-brand-light' },
     { label: '優惠券', value: `${activeCoupons} 張`, icon: Ticket, to: '/coupons', color: 'text-red-600 bg-red-50' }
   ];
 
@@ -45,7 +45,7 @@ export default function WalletPage() {
             <div className="rounded-2xl bg-orange-50 p-3 text-orange-600"><Gift size={25} /></div>
             <div>
               <p className="font-black">我的寄存</p>
-              <p className="text-sm text-slate-500">美式咖啡剩 {state.storedProducts[0].total - state.storedProducts[0].redeemed} 杯</p>
+              <p className="text-sm text-slate-500">共剩 {state.storedProducts.reduce((sum, item) => sum + item.total - item.redeemed, 0)} 份可兌換</p>
             </div>
           </div>
           <ChevronRight className="text-slate-400" />

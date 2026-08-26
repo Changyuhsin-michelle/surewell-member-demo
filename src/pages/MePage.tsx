@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bell, Bot, ChevronRight, CircleHelp, Coffee, History, LogOut, RotateCcw, Settings, ShieldCheck, User } from 'lucide-react';
+import { Bell, Bot, BarChart3, ChevronRight, CircleHelp, Coffee, Coins, History, LogOut, RotateCcw, Settings, ShieldCheck, Trophy, User } from 'lucide-react';
 import { Button, Card, Modal, PageHeader, SecondaryButton } from '../components/UI';
 import { useDemo } from '../store/DemoContext';
 import { useNavigate } from 'react-router-dom';
@@ -13,7 +13,10 @@ export default function MePage() {
   const [logoutOpen, setLogoutOpen] = useState(false);
 
   const menu = [
-    { label: '會員權益', icon: ShieldCheck, action: () => navigate('/member-card') },
+    { label: '會員權益', icon: ShieldCheck, action: () => navigate('/member-benefits') },
+    { label: '點數中心', icon: Coins, action: () => navigate('/points') },
+    { label: '會員任務', icon: Trophy, action: () => navigate('/missions') },
+    { label: '消費洞察', icon: BarChart3, action: () => navigate('/spending-insights') },
     { label: '交易明細', icon: History, action: () => navigate('/transactions') },
     { label: '我的寄存', icon: Coffee, action: () => navigate('/stored-products') },
     { label: '通知中心', icon: Bell, action: () => navigate('/notifications') },

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Search, SlidersHorizontal } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Badge, Button, Card, EmptyState, Modal, QRBox, SecondaryButton } from '../components/UI';
 import { useDemo } from '../store/DemoContext';
 import type { Coupon, CouponStatus } from '../types';
@@ -12,6 +13,7 @@ const tabs: { key: CouponStatus; label: string }[] = [
 
 export default function CouponsPage() {
   const { state, useCoupon } = useDemo();
+  const navigate = useNavigate();
   const [tab, setTab] = useState<CouponStatus>('available');
   const [selected, setSelected] = useState<Coupon | null>(null);
   const [loading, setLoading] = useState(false);
@@ -87,7 +89,10 @@ export default function CouponsPage() {
             <p>門檻：{coupon.threshold}</p>
             <p className="col-span-2">適用商品：{coupon.product}</p>
           </div>
-          <Button onClick={() => setSelected(coupon)} disabled={coupon.status === 'used'} className="mt-4 w-full py-2.5">{coupon.status === 'used' ? '已使用' : '立即使用'}</Button>
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <Button onClick={() => navigate(`/coupons/${coupon.id}`)} className="py-2.5">詳細</Button>
+            <Button onClick={() => setSelected(coupon)} disabled={coupon.status === 'used'} className="py-2.5">{coupon.status === 'used' ? '已使用' : '立即使用'}</Button>
+          </div>
             </div>
           </div>
         </Card>

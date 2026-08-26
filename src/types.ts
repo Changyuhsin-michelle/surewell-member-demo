@@ -1,5 +1,5 @@
 export type CouponStatus = 'available' | 'expiring' | 'used';
-export type TransactionType = 'purchase' | 'topup' | 'points' | 'coupon' | 'stored';
+export type TransactionType = 'purchase' | 'topup' | 'payment' | 'points' | 'coupon' | 'stored';
 export type NotificationType = 'offer' | 'coupon' | 'points' | 'wallet';
 
 export interface Member {
@@ -32,6 +32,10 @@ export interface Coupon {
   threshold: string;
   product: string;
   status: CouponStatus;
+  category?: string;
+  daysLeft?: number;
+  store?: string;
+  note?: string;
 }
 
 export interface Transaction {
@@ -43,6 +47,13 @@ export interface Transaction {
   amount?: number;
   points?: number;
   detail: string;
+  time?: string;
+  invoiceNo?: string;
+  originalAmount?: number;
+  discount?: number;
+  couponUsed?: string;
+  paymentMethod?: string;
+  status?: string;
 }
 
 export interface StoredProduct {
@@ -51,6 +62,38 @@ export interface StoredProduct {
   total: number;
   redeemed: number;
   expireDate: string;
+  unit?: string;
+  category?: '飲品' | '食品' | '其他';
+  color?: string;
+}
+
+export interface Mission {
+  id: string;
+  title: string;
+  description: string;
+  current: number;
+  target: number;
+  unit: string;
+  rewardType: 'points' | 'coupon';
+  rewardLabel: string;
+  rewardPoints?: number;
+  rewardCouponTitle?: string;
+  claimed: boolean;
+}
+
+export interface PointReward {
+  id: string;
+  title: string;
+  pointsCost: number;
+  valueLabel: string;
+  claimed: boolean;
+}
+
+export interface Insight {
+  thisMonth: number;
+  lastMonth: number;
+  categories: { label: string; percent: number }[];
+  favorites: string[];
 }
 
 export interface NotificationItem {
@@ -69,4 +112,7 @@ export interface DemoState {
   transactions: Transaction[];
   storedProducts: StoredProduct[];
   notifications: NotificationItem[];
+  missions: Mission[];
+  pointRewards: PointReward[];
+  insight: Insight;
 }
