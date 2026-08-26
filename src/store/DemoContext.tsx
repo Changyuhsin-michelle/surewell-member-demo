@@ -255,10 +255,17 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
 
   const payWithWallet = useCallback((amount: number) => {
     commit((current) => {
-      if (amount <= 0 || current.wallet.storedValue < amount) return current;
+      const available = current.wallet.storedValue + current.wallet.shoppingCredit;
+      if (amount <= 0 || available < amount) return current;
+      const creditUsed = Math.min(current.wallet.shoppingCredit, amount);
+      const storedUsed = amount - creditUsed;
       return {
         ...current,
-        wallet: { ...current.wallet, storedValue: current.wallet.storedValue - amount },
+        wallet: {
+          ...current.wallet,
+          shoppingCredit: current.wallet.shoppingCredit - creditUsed,
+          storedValue: current.wallet.storedValue - storedUsed
+        },
         transactions: [
           newTransaction({
             type: 'payment',
@@ -267,14 +274,15 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
             title: '喜互惠 Demo 店',
             store: 'Demo 店',
             amount: -amount,
-            detail: `使用儲值金付款 ${amount.toLocaleString()} 元。`,
-            paymentMethod: '儲值金',
+            detail: `購物金折抵 ${creditUsed.toLocaleString()} 元，儲值金付款 ${storedUsed.toLocaleString()} 元。`,
+            paymentMethod: creditUsed > 0 && storedUsed > 0 ? '購物金 + 儲值金' : creditUsed > 0 ? '購物金' : '儲值金',
+            discount: creditUsed,
             status: '付款成功'
           }),
           ...current.transactions
         ]
       };
-    }, `付款成功，已扣款 $${amount.toLocaleString()}`);
+    }, `付款成功，已使用 $${amount.toLocaleString()}`);
   }, [commit]);
 
   const markAllNotificationsRead = useCallback(() => {

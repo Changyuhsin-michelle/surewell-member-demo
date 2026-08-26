@@ -8,6 +8,10 @@ export default function MemberCardPage() {
   const [bright, setBright] = useState(false);
   const [payOpen, setPayOpen] = useState(false);
   const [amount, setAmount] = useState('200');
+  const payableAmount = Number(amount);
+  const totalPayable = state.wallet.storedValue + state.wallet.shoppingCredit;
+  const creditPreview = Math.min(state.wallet.shoppingCredit, Math.max(0, payableAmount));
+  const storedPreview = Math.max(0, payableAmount - creditPreview);
   const progress = Math.min(100, Math.round((state.member.yearlySpend / state.member.nextLevelTarget) * 100));
 
   return (
@@ -35,10 +39,10 @@ export default function MemberCardPage() {
           ))}
         </div>
         <div className={`relative mt-4 rounded-[30px] bg-white p-4 text-slate-900 shadow-xl ${bright ? 'scale-[1.03]' : ''}`}>
-          <p className="mb-3 text-center text-sm font-black text-slate-500">{mode === 'member' ? '結帳時請出示會員碼' : '使用儲值金付款'}</p>
-          <QRBox label={mode === 'member' ? state.member.memberNo : `儲值金 $${state.wallet.storedValue.toLocaleString()}`} />
+          <p className="mb-3 text-center text-sm font-black text-slate-500">{mode === 'member' ? '結帳時請出示會員碼' : '使用會員錢包付款'}</p>
+          <QRBox label={mode === 'member' ? state.member.memberNo : `可用 $${totalPayable.toLocaleString()}`} />
           <div className="mt-4"><Barcode /></div>
-          {mode === 'payment' && <Button onClick={() => setPayOpen(true)} className="mt-4 w-full">使用儲值金付款</Button>}
+          {mode === 'payment' && <Button onClick={() => setPayOpen(true)} className="mt-4 w-full">使用會員錢包付款</Button>}
         </div>
         <div className="mt-4 grid grid-cols-2 gap-3">
           <SecondaryButton onClick={() => setBright((value) => !value)} className={bright ? 'bg-brand-green text-white ring-brand-green' : 'bg-white/15 text-white ring-white/20'}>提升亮度</SecondaryButton>
@@ -74,16 +78,27 @@ export default function MemberCardPage() {
         </ul>
       </Card>
       {payOpen && (
-        <Modal title="儲值金付款" onClose={() => setPayOpen(false)}>
+        <Modal title="會員錢包付款" onClose={() => setPayOpen(false)}>
           <div className="space-y-4">
-            <Card className="shadow-none">
-              <p className="text-sm text-slate-500">目前可用儲值金</p>
-              <p className="text-3xl font-black">${state.wallet.storedValue.toLocaleString()}</p>
-            </Card>
+            <div className="grid grid-cols-2 gap-3">
+              <Card className="shadow-none">
+                <p className="text-sm text-slate-500">購物金</p>
+                <p className="text-2xl font-black">${state.wallet.shoppingCredit.toLocaleString()}</p>
+              </Card>
+              <Card className="shadow-none">
+                <p className="text-sm text-slate-500">儲值金</p>
+                <p className="text-2xl font-black">${state.wallet.storedValue.toLocaleString()}</p>
+              </Card>
+            </div>
             <input value={amount} onChange={(event) => setAmount(event.target.value.replace(/\D/g, ''))} className="w-full rounded-2xl bg-slate-50 px-4 py-3 outline-none ring-1 ring-slate-200 focus:ring-brand-green" placeholder="輸入付款金額" />
+            <div className="rounded-3xl bg-brand-light p-4 text-sm leading-7 text-brand-deep">
+              <p className="font-black">付款順序：優先使用購物金，不足再扣儲值金</p>
+              <p>本次預估折抵購物金 ${creditPreview.toLocaleString()}</p>
+              <p>本次預估扣儲值金 ${storedPreview.toLocaleString()}</p>
+            </div>
             <div className="grid grid-cols-2 gap-3">
               <SecondaryButton onClick={() => setPayOpen(false)}>取消</SecondaryButton>
-              <Button disabled={Number(amount) <= 0 || Number(amount) > state.wallet.storedValue} onClick={() => { payWithWallet(Number(amount)); setPayOpen(false); }}>確認付款</Button>
+              <Button disabled={payableAmount <= 0 || payableAmount > totalPayable} onClick={() => { payWithWallet(payableAmount); setPayOpen(false); }}>確認付款</Button>
             </div>
           </div>
         </Modal>
